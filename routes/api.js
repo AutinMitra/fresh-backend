@@ -67,7 +67,7 @@ router.get('/cluster', async (req, res) => {
           .status(400)
           .send({ error: 'Please provide the radius and neighborhood size!' })
 
-      clusters = dbScan(dataSet, req.query.radius, req.query.neighborhoodSize)
+      clusters = dbScan(dataSet, parseFloat(req.query.radius), parseFloat(req.query.neighborhoodSize))
       break
 
     // Use optics algorithm
@@ -82,7 +82,7 @@ router.get('/cluster', async (req, res) => {
           .status(400)
           .send({ error: 'Please provide the radius and neighborhood size!' })
 
-      clusters = optics(dataSet, req.query.radius, req.query.neighborhoodSize)
+      clusters = optics(dataSet, parseFloat(req.query.radius), parseFloat(req.query.neighborhoodSize))
       break
 
     // Use kmeans clustering
@@ -92,7 +92,7 @@ router.get('/cluster', async (req, res) => {
           .status(400)
           .send({ error: 'Please provide the number of clusters' })
 
-      clusters = kMeans(dataSet, req.query.numClusters)
+      clusters = kMeans(dataSet, parseInt(req.query.numClusters))
   }
 
   let finalRes = []
@@ -115,7 +115,8 @@ function optics(dataSet, radius, neighborhoodSize) {
 }
 
 function kMeans(dataSet, numClusters) {
-  const algo = new clustering.OPTICS()
+  console.log(dataSet)
+  const algo = new clustering.KMEANS()
   return algo.run(dataSet, numClusters)
 }
 
