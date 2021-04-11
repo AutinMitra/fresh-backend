@@ -1,6 +1,6 @@
 const express = require('express')
 const multer = require('multer')
-const {v4} = require('uuid')
+const { v4 } = require('uuid')
 const UploadModel = require('../schemas/upload')
 const clustering = require('density-clustering')
 
@@ -14,10 +14,10 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     // uuid all the things, anti-duplicates
     const split = file.originalname.split('.')
-    cb(null, v4() + '.' + split[split.length-1])
-  }
+    cb(null, v4() + '.' + split[split.length - 1])
+  },
 })
-const upload = multer({storage})
+const upload = multer({ storage })
 
 // Routes
 router.post('/upload', upload.single('file'), async (req, res) => {
@@ -29,12 +29,12 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       lng: req.body.lng,
       label: req.body.label,
       imagePath: req.file.path,
-      uuid: v4()
+      uuid: v4(),
     })
     await upload.save()
 
     res.send(req.file)
-  } catch(err) {
+  } catch (err) {
     console.log(err)
     res.sendStatus(400)
   }
@@ -45,36 +45,52 @@ router.get('/allInfo', async (req, res) => {
 })
 
 router.get('/cluster', async (req, res) => {
-  let data = await getAllData();
-  let dataSet = [];
+  let data = await getAllData()
+  let dataSet = []
 
   data.forEach((obj) => {
     dataSet.push([obj.lat, obj.lng])
   })
 
-  var clusters;
+  var clusters
 
   switch (req.query.algo) {
     // Use dbscan clustering
-    case "dbscan":
-      if (!req.query.radius || !req.query.radius || isNaN(req.query.radius) || isNaN(req.query.neighborhoodSize))
-        return res.status(400).send({error: "Please provide the radius and neighborhood size!"})
-      
+    case 'dbscan':
+      if (
+        !req.query.radius ||
+        !req.query.radius ||
+        isNaN(req.query.radius) ||
+        isNaN(req.query.neighborhoodSize)
+      )
+        return res
+          .status(400)
+          .send({ error: 'Please provide the radius and neighborhood size!' })
+
       clusters = dbScan(dataSet, req.query.radius, req.query.neighborhoodSize)
       break
 
     // Use optics algorithm
-    case "optics":
-      if (!req.query.radius || !req.query.radius || isNaN(req.query.radius) || isNaN(req.query.neighborhoodSize))
-        return res.status(400).send({error: "Please provide the radius and neighborhood size!"})
-      
+    case 'optics':
+      if (
+        !req.query.radius ||
+        !req.query.radius ||
+        isNaN(req.query.radius) ||
+        isNaN(req.query.neighborhoodSize)
+      )
+        return res
+          .status(400)
+          .send({ error: 'Please provide the radius and neighborhood size!' })
+
       clusters = optics(dataSet, req.query.radius, req.query.neighborhoodSize)
       break
 
     // Use kmeans clustering
     default:
       if (!req.query.numClusters || isNaN(req.query.numClusters))
-        return res.status(400).send({error: "Please provide the number of clusters"})
+        return res
+          .status(400)
+          .send({ error: 'Please provide the number of clusters' })
 
       clusters = kMeans(dataSet, req.query.numClusters)
   }
@@ -108,15 +124,9 @@ async function getAllData() {
 
   await UploadModel.find({}, (err, uploads) => {
     uploads.forEach((obj) => {
-      let {
-        imagePath,
-        lat,
-        lng,
-        label,
-        uuid,
-      } = obj
+      let { imagePath, lat, lng, label, uuid } = obj
 
-      allInfo.push({imagePath, lat, lng, label, uuid})
+      allInfo.push({ imagePath, lat, lng, label, uuid })
     })
   })
 

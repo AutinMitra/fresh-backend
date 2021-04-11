@@ -15,12 +15,12 @@ const UploadSchema = new mongoose.Schema({
   },
   label: {
     type: String,
-    required: true
+    required: true,
   },
   uuid: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 })
 
 module.exports = mongoose.model('Upload', UploadSchema)

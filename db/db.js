@@ -6,12 +6,12 @@ async function initDB() {
   try {
     await mongoose.connect(URI, {
       useNewUrlParser: true,
-    });
-    console.log("Mongoose connected! :)")
-  } catch(err) {
-    console.log(`error occured: ${err}`);
-    throw err;
+    })
+    console.log('Mongoose connected! :)')
+  } catch (err) {
+    console.log(`error occured: ${err}`)
+    throw err
   }
 }
 
-module.exports = initDB;
+module.exports = initDB
